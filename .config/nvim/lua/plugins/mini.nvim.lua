@@ -1,14 +1,15 @@
 return {
-  'echasnovski/mini.nvim',
+  'nvim-mini/mini.nvim',
   version = '*',
-  dependencies = {
-    "ray-x/go.nvim",
-  },
   config = function()
     require("mini.ai").setup()
 
     require("mini.align").setup()
 
+    local is_not_single_window = function(win_id)
+      local tabpage_id = vim.api.nvim_win_get_tabpage(win_id)
+      return #vim.api.nvim_tabpage_list_wins(tabpage_id) > 1
+    end
     local animate = require("mini.animate")
     animate.setup({
       open = {
