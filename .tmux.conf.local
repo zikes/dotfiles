@@ -179,7 +179,7 @@ tmux_conf_theme_right_separator_sub=''  #   PowerlineSymbols.otf font
 #     - #{username}
 #     - #{username_ssh}
 tmux_conf_theme_status_left=' #S '
-tmux_conf_theme_status_right=', #{username}#{root} '
+tmux_conf_theme_status_right='#{?@profile,#[fg=#{?#{==:#{@profile},Work},colour208,colour33}]#[bg=#080808]#[fg=#000000]#[bg=#{?#{==:#{@profile},Work},colour208,colour33}]#[bold] #{@profile} ,#{username} }#{root}'
 
 # status left style
 tmux_conf_theme_status_left_fg='#000000,#e4e4e4,#e4e4e4'  # black, white , white
@@ -307,6 +307,12 @@ bind -r C-Right resize-pane -R 5
 bind -r C-Up resize-pane -U 5
 
 #set-option -ga update-environment ' KUBECONFIG'
+
+# GNOME Terminal profile (Main/Work) and its Claude account follow whichever
+# terminal attaches; @profile feeds the status line
+set-option -ga update-environment ' TERM_PROFILE CLAUDE_CONFIG_DIR'
+set-hook -g session-created[100] "run-shell 'tmux set -t #{q:session_id} @profile \"$(tmux show-environment -t #{q:session_id} TERM_PROFILE 2>/dev/null | cut -s -d= -f2)\"'"
+set-hook -g client-attached[100] "run-shell 'tmux set -t #{q:session_id} @profile \"$(tmux show-environment -t #{q:session_id} TERM_PROFILE 2>/dev/null | cut -s -d= -f2)\"'"
 set-option -g repeat-time 0
 set-window-option -g xterm-keys on
 
