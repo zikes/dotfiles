@@ -15,7 +15,9 @@ local function tab_win_closed(winnr)
       local last_buf_info = vim.fn.getbufinfo(tab_bufs[1])[1]
       if last_buf_info.name:match(".*NvimTree_%d*$") then       -- and that buffer is nvim tree
         vim.schedule(function ()
-          if #vim.api.nvim_list_wins() == 1 then                -- if its the last buffer in vim
+          if vim.v.exiting ~= vim.NIL then return end           -- already quitting (e.g. :qa)
+          if not vim.api.nvim_win_is_valid(tab_wins[1]) then return end
+          if #vim.api.nvim_list_tabpages() == 1 then            -- if its the last tab in vim (floats don't count)
             vim.cmd "quit"                                        -- then close all of vim
           else                                                  -- else there are more tabs open
             vim.api.nvim_win_close(tab_wins[1], true)             -- then close only the tab
@@ -39,6 +41,7 @@ vim.api.nvim_create_autocmd("WinClosed", {
   nested = true
 })
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
+vim.keymap.set("n", "<C-n>", open_nvim_tree, { desc = "nvim-tree: Toggle" })
 
 local function change_root_to_global_cwd()
   local api = require("nvim-tree.api")
@@ -51,7 +54,7 @@ return {
   version = "*",
   lazy = false,
   dependencies = {
-    "nvim-tree/nvim-web-devicons",
+    "nvim-mini/mini.nvim", -- mini.icons provides the nvim-web-devicons API
   },
   config = function()
     require("nvim-tree").setup {
@@ -64,7 +67,6 @@ return {
         end
         -- defaults
         api.config.mappings.default_on_attach(bufnr)
-        vim.keymap.set('n', '<C-n>', open_nvim_tree, opts("Toggle"))
         vim.keymap.set('n', '<C-c>', change_root_to_global_cwd, opts('Change Root To Global CWD'))
       end,
     }

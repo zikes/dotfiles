@@ -40,7 +40,4 @@ opt.sidescrolloff = 5
 opt.list = true
 opt.listchars = "tab:→\\ ,trail:~,extends:>,precedes:<"
 
--- When in Insert mode, Shift+Tab to insert literal tab
-vim.api.nvim_set_keymap("i", "<S-Tab>", "<C-V><Tab>", { noremap = true, silent = true})
-
 require("config.lazy")

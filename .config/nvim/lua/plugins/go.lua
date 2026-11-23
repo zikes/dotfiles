@@ -7,7 +7,8 @@ return {
   },
   config = function()
     require("go").setup({
-      lsp_cfg = true,
+      -- complete functions as `Name()` without argument placeholders
+      lsp_cfg = { settings = { gopls = { usePlaceholders = false } } },
     })
     local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
     vim.api.nvim_create_autocmd("BufWritePre", {

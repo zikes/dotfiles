@@ -1,12 +1,15 @@
 return {
   'nvim-telescope/telescope.nvim',
   version = '*',
-  dependencies = { 'nvim-lua/plenary.nvim' },
+  dependencies = { 'nvim-lua/plenary.nvim', 'nvim-mini/mini.nvim' },
   config = function()
     local telescope = require("telescope")
     local builtin = require("telescope.builtin")
     telescope.setup({
       defaults = {
+        -- mini.fuzzy for matching, mini.icons (via devicons mock) for icons
+        file_sorter = require("mini.fuzzy").get_telescope_sorter,
+        generic_sorter = require("mini.fuzzy").get_telescope_sorter,
         mappings = {
           i = {
             ["<esc>"] = "close",
