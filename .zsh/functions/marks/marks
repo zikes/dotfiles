@@ -1,0 +1,27 @@
+# List all bookmarks and where they point.
+
+emulate -L zsh
+_marks_dir || return 1
+
+local -a links
+links=($MARKPATH/*(N@))
+
+if (( ${#links} == 0 )); then
+  print -r -- "No marks set. Use 'mark <name>' to add one."
+  return 0
+fi
+
+# Width of the longest mark name, so the arrows line up.
+local link width=0
+for link in $links; do
+  (( ${#${link:t}} > width )) && width=${#${link:t}}
+done
+
+for link in $links; do
+  if [[ -d $link ]]; then
+    printf '%-*s -> %s\n' $width ${link:t} ${link:A}
+  else
+    # :A cannot resolve through a missing target, so read the link itself.
+    printf '%-*s -> %s (stale)\n' $width ${link:t} "$(readlink -- $link)"
+  fi
+done

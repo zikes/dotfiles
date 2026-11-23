@@ -1,0 +1,30 @@
+# Bookmark a directory.
+#
+#   mark <name> [dir]    # dir defaults to $PWD
+
+emulate -L zsh
+_marks_dir || return 1
+
+local name=$1
+if [[ -z $name ]]; then
+  print -ru2 -- "Usage: mark <name> [dir]"
+  return 1
+fi
+
+if [[ $name == */* || $name == .. || $name == . ]]; then
+  print -ru2 -- "mark: invalid mark name: $name"
+  return 1
+fi
+
+local target=${2:-$PWD}
+if [[ ! -d $target ]]; then
+  print -ru2 -- "mark: not a directory: $target"
+  return 1
+fi
+target=${target:A}
+
+# -n is required: without it, re-marking a name whose link already points at a
+# directory creates the new link *inside* that directory instead of replacing it.
+ln -sfn -- $target $MARKPATH/$name || return 1
+
+print -r -- "Marked $target as $name"

@@ -1,0 +1,10 @@
+# Resolve and prepare the bookmark directory.
+#
+# Respects a pre-existing $MARKPATH, otherwise defaults to ~/.marks, and
+# creates the directory on first use. Every public marks function calls this
+# first, so nothing has to run at shell startup.
+
+: ${MARKPATH:=$HOME/.marks}
+export MARKPATH
+
+[[ -d $MARKPATH ]] || mkdir -p -- $MARKPATH

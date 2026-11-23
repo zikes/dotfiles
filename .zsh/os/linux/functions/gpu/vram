@@ -1,0 +1,22 @@
+# VRAM used / total per GPU, read from sysfs (amdgpu's mem_info_vram_*).
+# "display" means the card has a connected monitor.
+#
+#   vram
+#   watchf -n1 vram
+
+local c d s pci disp used total ut=0 tt=0
+for c in /sys/class/drm/card<->; do
+  d=$c/device
+  [[ -r $d/mem_info_vram_total ]] || continue
+  pci=${$(readlink -f $d):t}
+  disp=headless
+  for s in $c-*/status(N); do
+    [[ "$(<$s)" == connected ]] && { disp=display; break }
+  done
+  used=$(<$d/mem_info_vram_used); total=$(<$d/mem_info_vram_total)
+  (( ut += used, tt += total ))
+  printf "%-6s %-12s %-8s %6.2f / %.2f GiB\n" \
+    ${c:t} $pci $disp $((used/1073741824.)) $((total/1073741824.))
+done
+printf "%-6s %-12s %-8s %6.2f / %.2f GiB\n" total "" "" \
+  $((ut/1073741824.)) $((tt/1073741824.))

@@ -1,0 +1,20 @@
+#compdef jump unmark
+
+# Completion for jump and unmark: mark names, described by their targets.
+
+local mp=${MARKPATH:-$HOME/.marks}
+local -a links descriptions
+local link
+
+links=($mp/*(N@))
+(( ${#links} )) || return 1
+
+for link in $links; do
+  if [[ -d $link ]]; then
+    descriptions+=("${link:t}:${link:A}")
+  else
+    descriptions+=("${link:t}:$(readlink -- $link) (stale)")
+  fi
+done
+
+_describe -t marks 'mark' descriptions

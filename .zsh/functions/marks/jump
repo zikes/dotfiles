@@ -1,0 +1,26 @@
+# Jump to a bookmarked directory.
+#
+#   jump <name>          # with no name, list what is available
+
+emulate -L zsh
+_marks_dir || return 1
+
+local name=$1
+if [[ -z $name ]]; then
+  print -ru2 -- "Usage: jump <name>"
+  marks
+  return 1
+fi
+
+local link=$MARKPATH/$name
+if [[ ! -L $link ]]; then
+  print -ru2 -- "Mark not found: $name"
+  return 1
+fi
+
+if ! cd -P -- $link 2>/dev/null; then
+  # Read the link itself: :A cannot resolve through a target that is gone.
+  print -ru2 -- "Mark '$name' is stale ($(readlink -- $link) is gone). Removing it."
+  rm -f -- $link
+  return 1
+fi

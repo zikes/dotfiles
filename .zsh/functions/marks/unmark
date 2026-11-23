@@ -1,0 +1,25 @@
+# Remove one or more bookmarks.
+#
+#   unmark <name> [name...]
+
+emulate -L zsh
+_marks_dir || return 1
+
+if (( $# == 0 )); then
+  print -ru2 -- "Usage: unmark <name> [name...]"
+  return 1
+fi
+
+local name
+local ret=0
+
+for name in "$@"; do
+  if [[ ! -L $MARKPATH/$name ]]; then
+    print -ru2 -- "Mark not found: $name"
+    ret=1
+    continue
+  fi
+  rm -i -- $MARKPATH/$name || ret=1
+done
+
+return $ret

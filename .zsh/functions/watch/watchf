@@ -1,0 +1,18 @@
+# watch(1) for zsh functions: runs the function in a fresh zsh each interval.
+#
+#   watchf [watch options] <function> [args...]
+#   watchf -n1 vram
+#
+# Options must be attached to their values (-n1, not -n 1).
+
+emulate -L zsh
+local -a wopts
+while [[ $1 == -* ]]; do wopts+=$1; shift; done
+if (( ! $+functions[$1] )); then
+  print -u2 "watchf: no such function: $1"
+  return 1
+fi
+# An autoloaded function that hasn't run yet is only a stub; load its body so
+# `functions` prints the real definition
+autoload +X $1 2>/dev/null
+watch $wopts -x zsh -c "$(functions $1); ${(j: :)${(q-)@}}"
