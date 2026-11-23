@@ -328,3 +328,6 @@ set-window-option -g xterm-keys on
 
 set -g default-command /bin/zsh
 
+# this machine's own settings, kept out of the repo
+source-file -q ~/.zsh.local/tmux.conf
+
