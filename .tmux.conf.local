@@ -277,7 +277,17 @@ tmux_conf_copy_to_os_clipboard=true
 set -g history-limit 10000
 
 # start with mouse mode enabled
-#set -g mouse on
+set -g mouse on
+
+# mouse drag copies to both the X clipboard (Ctrl+V) and primary selection (middle-click)
+set -s copy-command 'xclip -i -f -selection primary | xclip -i -selection clipboard >/dev/null 2>&1'
+# stay put after a drag instead of jumping back to the bottom
+bind -T copy-mode    MouseDragEnd1Pane send -X copy-pipe-no-clear
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-no-clear
+# apps that select and copy themselves (also over ssh) send OSC 52; GNOME Terminal
+# ignores it, so accept it into a tmux buffer and hand that buffer to xclip
+set -s set-clipboard on
+set-hook -g pane-set-clipboard 'run -b "tmux save-buffer - | xclip -i -f -selection primary | xclip -i -selection clipboard >/dev/null 2>&1"'
 
 # force Vi mode
 #   really you should export VISUAL or EDITOR environment variable, see manual
